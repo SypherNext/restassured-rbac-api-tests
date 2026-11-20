@@ -1,0 +1,75 @@
+name: API Tests
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out the test project
+        uses: actions/checkout@v4
+
+      - name: Check out the RBAC backend
+        uses: actions/checkout@v4
+        with:
+          repository: codedbyabhishekc/rbac-healthcare-system
+          path: rbac-healthcare-system
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install and start the RBAC backend
+        working-directory: rbac-healthcare-system/backend
+        run: |
+          npm install
+          mkdir -p database
+          echo "PORT=5000" >> .env
+          echo "JWT_SECRET=ci-only-secret" >> .env
+          echo "NODE_ENV=development" >> .env
+          npm start &
+          npx wait-on http://localhost:5000/api-docs
+
+      - name: Seed the database
+        working-directory: rbac-healthcare-system/backend
+        run: npm run seed
+
+      - name: Restart the backend after seeding
+        working-directory: rbac-healthcare-system/backend
+        run: |
+          pkill -f "node server.js" || true
+          npm start &
+          npx wait-on http://localhost:5000/api-docs
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: 'maven'
+
+      - name: Run the test suite
+        run: mvn test
+
+      - name: Generate the HTML surefire report
+        if: always()
+        run: mvn surefire-report:report-only
+
+      - name: Upload raw surefire results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: surefire-report-xml
+          path: target/surefire-reports/
+
+      - name: Upload HTML surefire report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: surefire-report-html
+          path: target/site/surefire-report.html

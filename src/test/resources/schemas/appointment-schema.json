@@ -1,0 +1,20 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "required": ["id", "patient_id", "doctor_id", "appointment_date", "status", "reason"],
+  "properties": {
+    "id": { "type": "integer" },
+    "patient_id": { "type": "integer" },
+    "doctor_id": { "type": "integer" },
+    "appointment_date": { "type": "string" },
+    "status": { "type": "string", "enum": ["scheduled", "completed", "cancelled"] },
+    "reason": { "type": "string" },
+    "notes": { "type": ["string", "null"] },
+    "created_at": { "type": "string" },
+    "updated_at": { "type": "string" },
+    "patient_name": { "type": "string" },
+    "patient_email": { "type": "string" },
+    "doctor_name": { "type": "string" },
+    "doctor_email": { "type": "string" }
+  }
+}
