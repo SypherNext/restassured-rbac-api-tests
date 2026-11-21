@@ -72,7 +72,7 @@ the tests (see below), or `-Drbac.baseUri=...` if the backend isn't on
 ### Windows (PowerShell), macOS, and Linux -- same commands
 
 ```bash
-git clone https://github.com/codedbyabhishekc/rbac-healthcare-system.git
+git clone https://github.com/SypherNext/rbac-healthcare-system.git
 cd rbac-healthcare-system/backend
 npm install
 npm run seed     # populates the SQLite database with the seed accounts
